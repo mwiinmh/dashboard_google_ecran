@@ -20,30 +20,39 @@
   <div id="last-update"></div>
   <div id="alerts">Chargement...</div>
 
-  <script>
-    async function load() {
-      const res  = await fetch('alerts.json?t=' + Date.now());
-      const data = await res.json();
-      const seen = {};
-      // Affiche uniquement le dernier statut par écran
-      const latest = data.filter(a => {
-        if (seen[a.screenName]) return false;
-        return (seen[a.screenName] = true);
-      });
-      document.getElementById('last-update').textContent =
-        'Mis à jour : ' + new Date().toLocaleString('fr-FR');
-      document.getElementById('alerts').innerHTML = latest.map(a => `
-        <div class="card">
-          <div class="dot ${a.status}"></div>
-          <div>
-            <strong>${a.screenName}</strong>
-            <div class="meta">${a.status === 'offline' ? '🔴 Débranché' : '🟢 Connecté'} — ${new Date(a.date).toLocaleString('fr-FR')}</div>
+  <div id="alerts">Chargement...</div>
+<script>
+  function fmt(iso) {
+    if (!iso) return "—";
+    return new Date(iso).toLocaleString('fr-FR');
+  }
+
+  async function load() {
+    const res  = await fetch('alerts.json?t=' + Date.now());
+    const data = await res.json();
+    const seen = {};
+    const latest = data.filter(a => {
+      if (seen[a.screenName]) return false;
+      return (seen[a.screenName] = true);
+    });
+    document.getElementById('last-update').textContent =
+      'Mis à jour : ' + new Date().toLocaleString('fr-FR');
+    document.getElementById('alerts').innerHTML = latest.map(a => `
+      <div class="card">
+        <div class="dot ${a.status}"></div>
+        <div>
+          <strong>${a.screenName}</strong>
+          <div class="meta">
+            ${a.status === 'offline' ? '🔴 Débranché' : '🟢 Connecté'}
+            — Signalé le : ${fmt(a.issueOpened)}
+            ${a.issueClosedAt ? '<br>✅ Résolu le : ' + fmt(a.issueClosedAt) : '<br>⚠️ En cours'}
           </div>
         </div>
-      `).join('');
-    }
-    load();
-    setInterval(load, 30000); // Refresh JS toutes les 30s aussi
-  </script>
+      </div>
+    `).join('');
+  }
+  load();
+  setInterval(load, 30000);
+</script>
 </body>
 </html>
