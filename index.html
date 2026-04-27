@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Écrans</title>
+  <meta http-equiv="refresh" content="30">
+  <style>
+    body { font-family: sans-serif; max-width: 700px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { font-size: 1.4rem; }
+    .card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin: .75rem 0; display: flex; gap: 1rem; align-items: center; }
+    .dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+    .online  { background: #22c55e; }
+    .offline { background: #ef4444; }
+    .meta { font-size: .8rem; color: #666; }
+    #last-update { font-size: .8rem; color: #999; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>🖥️ Statut des écrans</h1>
+  <div id="last-update"></div>
+  <div id="alerts">Chargement...</div>
+
+  <script>
+    async function load() {
+      const res  = await fetch('alerts.json?t=' + Date.now());
+      const data = await res.json();
+      const seen = {};
+      // Affiche uniquement le dernier statut par écran
+      const latest = data.filter(a => {
+        if (seen[a.screenName]) return false;
+        return (seen[a.screenName] = true);
+      });
+      document.getElementById('last-update').textContent =
+        'Mis à jour : ' + new Date().toLocaleString('fr-FR');
+      document.getElementById('alerts').innerHTML = latest.map(a => `
+        <div class="card">
+          <div class="dot ${a.status}"></div>
+          <div>
+            <strong>${a.screenName}</strong>
+            <div class="meta">${a.status === 'offline' ? '🔴 Débranché' : '🟢 Connecté'} — ${new Date(a.date).toLocaleString('fr-FR')}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+    load();
+    setInterval(load, 30000); // Refresh JS toutes les 30s aussi
+  </script>
+</body>
+</html>
