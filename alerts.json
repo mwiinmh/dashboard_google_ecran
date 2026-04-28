@@ -1,5 +1,13 @@
 [
   {
+    "id": "1777369164268",
+    "screenName": "Salle inconnue",
+    "status": "offline",
+    "issueOpened": null,
+    "issueClosedAt": null,
+    "date": "2026-04-28T09:39:23.923Z"
+  },
+  {
     "id": "1777368833213",
     "screenName": "Salle 25 (133, RDC)",
     "status": "online",
